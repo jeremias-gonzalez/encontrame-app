@@ -1,0 +1,16 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <style>
+    .fav-bg { fill: #8D4925; transition: fill 0.3s ease; }
+    .fav-paw { fill: #F3E6CF; transition: fill 0.3s ease; }
+    @media (prefers-color-scheme: dark) {
+      .fav-bg { fill: #2A1B11; }
+      .fav-paw { fill: #F3E6CF; }
+    }
+  </style>
+  <rect width="48" height="48" rx="14" class="fav-bg" />
+  <circle cx="15.5" cy="17" r="3.5" class="fav-paw" />
+  <circle cx="32.5" cy="17" r="3.5" class="fav-paw" />
+  <circle cx="21" cy="11.5" r="3.2" class="fav-paw" />
+  <circle cx="27" cy="11.5" r="3.2" class="fav-paw" />
+  <path d="M24 21.5c-5.5 0-9.5 3.5-9.5 7.5 0 4.5 4.2 8 9.5 8s9.5-3.5 9.5-8c0-4-4-7.5-9.5-7.5z" class="fav-paw" />
+</svg>
