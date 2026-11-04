@@ -71,7 +71,7 @@ export function MetricCards({ metrics }) {
             whileHover={{ y: -3, transition: { duration: 0.2 } }}
             className="glass-card rounded-3xl p-5 relative overflow-hidden group select-none"
           >
-            {/* Ambient subtle glow */}
+            
             <div
               className={`absolute -top-12 -right-12 w-28 h-28 rounded-full bg-gradient-to-br ${card.gradient} blur-2xl pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity`}
             />

@@ -22,7 +22,7 @@ export default {
         cobreClaro: 'var(--color-cobre-claro)',
       },
       fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
       }
     },
   },

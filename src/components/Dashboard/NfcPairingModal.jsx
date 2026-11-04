@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { X, Radio, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
 
-const FILAMENT_COLORS = [
-  'Azul Cobalto',
-  'Naranja Flúor',
-  'Verde Lima',
-  'Negro Mate',
-  'Lavanda Pastel',
-  'Rojo Fuego',
-];
+
 
 export function NfcPairingModal({
   isOpen,
@@ -17,7 +10,7 @@ export function NfcPairingModal({
   onConfirmPair,
 }) {
   const [tagCode, setTagCode] = useState('');
-  const [selectedColor, setSelectedColor] = useState(FILAMENT_COLORS[0]);
+
   const [isSimulatingScan, setIsSimulatingScan] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -44,7 +37,7 @@ export function NfcPairingModal({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onConfirmPair(pet.id, tagCode.trim().toUpperCase(), selectedColor);
+      await onConfirmPair(pet.id, tagCode.trim().toUpperCase());
       onClose();
     } catch (err) {
       setError(err.message || 'Error al vincular el dije.');
@@ -63,7 +56,7 @@ export function NfcPairingModal({
               <Radio className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-text">Vincular Dije 3D NFC</h3>
+              <h3 className="text-lg font-bold text-text">Llavero</h3>
               <p className="text-xs text-textMuted">
                 Para el paciente: <span className="font-bold text-text">{pet.name || pet.nombre}</span>
               </p>
@@ -100,16 +93,16 @@ export function NfcPairingModal({
                 {isSimulatingScan ? 'Leyendo chip NFC...' : 'Lector de Mostrador Listo'}
               </h4>
               <p className="text-xs text-textMuted mt-0.5">
-                Acerca el dije físico al lector o presiona el botón para simular la lectura.
+                Acerca el llavero físico al lector o presiona el botón para simular la lectura.
               </p>
             </div>
           </div>
 
-          {/* Campo de Código */}
+          
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-bold text-textMuted uppercase tracking-wider">
-                Código del Dije (Tag ID)
+                Código del LLavero (Tag ID)
               </label>
               <button
                 type="button"
@@ -130,44 +123,7 @@ export function NfcPairingModal({
             />
           </div>
 
-          {/* Color del Filamento */}
-          <div>
-            <label className="block text-xs font-bold text-textMuted mb-2 uppercase tracking-wider">
-              Color del Dije Impreso en 3D
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {FILAMENT_COLORS.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setSelectedColor(color)}
-                  className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-                    selectedColor === color
-                      ? 'border-primary bg-surface shadow-sm text-primary ring-2 ring-primary/20'
-                      : 'border-slate-200 dark:border-slate-800 bg-surface/60 text-textMuted hover:text-text'
-                  }`}
-                >
-                  <span
-                    className={`w-3.5 h-3.5 rounded-full ${
-                      color === 'Azul Cobalto'
-                        ? 'bg-blue-600'
-                        : color === 'Naranja Flúor'
-                        ? 'bg-orange-500'
-                        : color === 'Verde Lima'
-                        ? 'bg-lime-500'
-                        : color === 'Negro Mate'
-                        ? 'bg-slate-900'
-                        : color === 'Lavanda Pastel'
-                        ? 'bg-purple-400'
-                        : 'bg-red-600'
-                    }`}
-                  />
-                  <span className="truncate">{color}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
+        
           {/* Botones de Acción */}
           <div className="pt-2 flex items-center justify-end gap-3">
             <button

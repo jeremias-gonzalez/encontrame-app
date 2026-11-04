@@ -12,14 +12,6 @@ const PRESET_PHOTOS = [
   { label: 'Atigrado', url: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=600&q=80' },
 ];
 
-const FILAMENT_COLORS = [
-  'Azul Cobalto',
-  'Naranja Flúor',
-  'Verde Lima',
-  'Negro Mate',
-  'Lavanda Pastel',
-  'Rojo Fuego',
-];
 
 export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
   // Contextos
@@ -61,7 +53,6 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
   // Estados de NFC
   const [hasNfc, setHasNfc] = useState(false);
   const [tagCode, setTagCode] = useState('');
-  const [filamentColor, setFilamentColor] = useState(FILAMENT_COLORS[0]);
   const [availableTags, setAvailableTags] = useState([]);
 
   // useEffect para sincronizar cuando se abre el modal o cambia editingPet
@@ -72,7 +63,7 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
       setNombre(editingPet.nombre || editingPet.name || '');
       setEspecie(editingPet.especie || editingPet.species || 'Perro');
       setRaza(editingPet.raza || editingPet.breed || '');
-      setColor(editingPet.color || 'Marrón');
+    
       setFotoUrl(editingPet.foto_url || editingPet.photoUrl || PRESET_PHOTOS[0].url);
       setEstadoExtravio(editingPet.estado_extravio || (editingPet.isLost ? 'perdido' : 'en_casa'));
       setNotasMedicas(editingPet.notas_medicas || editingPet.medicalNotes || '');
@@ -96,13 +87,11 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
 
       setHasNfc(!!editingPet.nfcTag || !!editingPet.tag_id);
       setTagCode(editingPet.nfcTag?.tagCode || '');
-      setFilamentColor(editingPet.nfcTag?.filamentColor || FILAMENT_COLORS[0]);
     } else {
       // Reset formulario limpio
       setNombre('');
       setEspecie('Perro');
       setRaza('');
-      setColor('Marrón');
       setFotoUrl(PRESET_PHOTOS[0].url);
       setEstadoExtravio('en_casa');
       setNotasMedicas('');
@@ -195,7 +184,6 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
         nombre: nombre.trim(),
         especie: especie.trim(),
         raza: raza.trim(),
-        color: color.trim() || 'No especificado',
         foto_url: fotoUrl.trim(),
         estado_extravio: estadoExtravio,
         notas_medicas: notasMedicas.trim() || null,
@@ -224,8 +212,7 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
         nfcTag: hasNfc
           ? {
               tagCode: tagCode.trim().toUpperCase() || `ENC-${Math.floor(1000 + Math.random() * 9000)}-NFC`,
-              status: 'active',
-              filamentColor,
+              status: 'active',      
             }
           : undefined,
       };
@@ -266,7 +253,7 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
         </div>
 
         {/* Pestañas de Navegación del Formulario */}
-        <div className="flex border-b border-slate-100 dark:border-slate-800 px-6 bg-slate-50/50 dark:bg-slate-900/30 text-sm font-semibold">
+        <div className="flex justify-center px-6 bg-slate-50/50 dark:bg-slate-900/30 text-sm font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab('pet')}
@@ -291,18 +278,7 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
             <User className="w-4 h-4" />
             2. Tutor / Contacto
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('nfc')}
-            className={`py-3 px-4 border-b-2 flex items-center gap-2 transition-colors ${
-              activeTab === 'nfc'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-textMuted hover:text-text'
-            }`}
-          >
-            <Radio className="w-4 h-4" />
-            3. Dije 3D NFC
-          </button>
+    
         </div>
 
         {/* Alerta de Error si aplica */}
@@ -588,120 +564,7 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
             </div>
           )}
 
-          {/* TAB 3: VINCULACIÓN NFC */}
-          {activeTab === 'nfc' && (
-            <div className="space-y-4 text-sm">
-              <div className="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-text flex items-center gap-2">
-                    <Radio className="w-4 h-4 text-primary" />
-                    ¿Vincular Dije Físico 3D con NFC ahora?
-                  </h4>
-                  <p className="text-xs text-textMuted">
-                    Asigna un tag NFC registrado en FastAPI o ingresa su código.
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={hasNfc}
-                  onChange={(e) => setHasNfc(e.target.checked)}
-                  className="w-5 h-5 rounded text-primary focus:ring-primary cursor-pointer"
-                />
-              </div>
-
-              {hasNfc && (
-                <div className="p-4 rounded-2xl border border-primary/20 bg-primary/5 space-y-4">
-                  {/* Selector de Tag de FastAPI */}
-                  {availableTags.length > 0 && (
-                    <div>
-                      <label className="block text-xs font-bold text-textMuted mb-1 uppercase tracking-wider">
-                        Seleccionar Tag NFC de FastAPI (/tags/)
-                      </label>
-                      <select
-                        value={tagId}
-                        onChange={(e) => {
-                          setTagId(e.target.value);
-                          const t = availableTags.find((item) => String(item.id) === String(e.target.value));
-                          if (t) {
-                            setTagCode(t.codigoQR || t.token_publico || t.uidNFC);
-                          }
-                        }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition cursor-pointer"
-                      >
-                        <option value="">-- Asignación manual / Generar código --</option>
-                        {availableTags.map((tag) => (
-                          <option key={tag.id} value={tag.id}>
-                            ID #{tag.id} - {tag.codigoQR || tag.token_publico} ({tag.estado || 'disponible'})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-textMuted uppercase tracking-wider">
-                        Código de Dije Grabado (QR / NFC) *
-                      </label>
-                      <button
-                        type="button"
-                        onClick={generateRandomTagCode}
-                        className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Generar nuevo código
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      required={hasNfc}
-                      value={tagCode}
-                      onChange={(e) => setTagCode(e.target.value.toUpperCase())}
-                      placeholder="Ej. ENC-7842-NFC"
-                      className="w-full font-mono uppercase tracking-wider px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text font-bold text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-textMuted mb-2 uppercase tracking-wider">
-                      Color del Filamento 3D del Dije
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {FILAMENT_COLORS.map((colorItem) => (
-                        <button
-                          key={colorItem}
-                          type="button"
-                          onClick={() => setFilamentColor(colorItem)}
-                          className={`flex items-center gap-2 p-2 rounded-xl border text-xs font-semibold transition ${
-                            filamentColor === colorItem
-                              ? 'border-primary bg-surface shadow-sm text-primary ring-2 ring-primary/20'
-                              : 'border-slate-200 dark:border-slate-800 bg-surface/60 text-textMuted hover:text-text'
-                          }`}
-                        >
-                          <span
-                            className={`w-3.5 h-3.5 rounded-full ${
-                              colorItem === 'Azul Cobalto'
-                                ? 'bg-blue-600'
-                                : colorItem === 'Naranja Flúor'
-                                ? 'bg-orange-500'
-                                : colorItem === 'Verde Lima'
-                                ? 'bg-lime-500'
-                                : colorItem === 'Negro Mate'
-                                ? 'bg-slate-900'
-                                : colorItem === 'Lavanda Pastel'
-                                ? 'bg-purple-400'
-                                : 'bg-red-600'
-                            }`}
-                          />
-                          <span className="truncate">{colorItem}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+        
 
           {/* Footer del Modal */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">

@@ -61,23 +61,14 @@ export function Sidebar({
       badge: metrics?.lostPetsCount && metrics.lostPetsCount > 0 ? `${metrics.lostPetsCount}` : undefined,
       badgeColor: 'bg-rose-500 text-white animate-pulse',
     },
-    {
-      to: '/simulador',
-      label: 'Simulador NFC',
-      icon: ScanLine,
-      badge: 'Móvil',
-    },
-    {
-      to: '/landing',
-      label: 'Web Comercial',
-      icon: Globe,
-    },
+ 
+ 
   ];
 
   return (
     <aside className="w-72 h-screen sticky top-0 flex flex-col justify-between p-4 glass-panel border-r border-slate-300/40 dark:border-white/10 shrink-0 z-30 select-none">
       <div className="space-y-6">
-        {/* Brand Header con Logotipo Oficial Adaptativo */}
+
         <div className="px-2 pt-1">
           <div className="flex items-center justify-between gap-2">
             <motion.div
@@ -89,12 +80,10 @@ export function Sidebar({
             </motion.div>
           </div>
           <p className="text-[11px] font-medium text-textMuted mt-1 flex items-center gap-1.5 pl-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             {currentVeterinaria?.nombre || 'Veterinaria San Roque'} · Panel Clínico
           </p>
         </div>
 
-        {/* Botones de Acción Rápida con paleta Cobrizo #8D4925 */}
         <div className="px-2 space-y-2">
           <motion.button
             whileHover={{ y: -1, scale: 1.01 }}
@@ -106,24 +95,7 @@ export function Sidebar({
             <span>Nueva Mascota</span>
           </motion.button>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={onOpenCreateUser}
-              className="py-1.5 px-2 rounded-xl bg-surface/70 hover:bg-surface border border-primary/20 text-[11px] font-bold text-text flex items-center justify-center gap-1 transition cursor-pointer"
-              title="Registrar nuevo usuario/dueño en FastAPI"
-            >
-              <UserPlus className="w-3.5 h-3.5 text-primary" />
-              <span>+ Dueño</span>
-            </button>
-            <button
-              onClick={onOpenCreateVeterinaria}
-              className="py-1.5 px-2 rounded-xl bg-surface/70 hover:bg-surface border border-primary/20 text-[11px] font-bold text-text flex items-center justify-center gap-1 transition cursor-pointer"
-              title="Registrar nueva veterinaria en FastAPI"
-            >
-              <Building2 className="w-3.5 h-3.5 text-primary" />
-              <span>+ Vet</span>
-            </button>
-          </div>
+         
 
           <motion.button
             whileHover={{ y: -1, scale: 1.01 }}

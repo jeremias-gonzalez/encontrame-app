@@ -28,10 +28,7 @@ export function TagsPage({ onPreviewNfc }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            Hardware & Tecnología 3D
-          </div>
+        
           <h2 className="text-3xl font-black text-[#92553A] dark:text-[#E3B48F] tracking-tight">
             Gestión de Dijes 3D NFC
           </h2>

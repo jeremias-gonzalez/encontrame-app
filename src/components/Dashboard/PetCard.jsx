@@ -44,24 +44,7 @@ export function PetCard({
     }
   };
 
-  const getFilamentColorDot = (color) => {
-    switch (color) {
-      case 'Azul Cobalto':
-        return 'bg-blue-600';
-      case 'Naranja Flúor':
-        return 'bg-orange-500';
-      case 'Verde Lima':
-        return 'bg-lime-500';
-      case 'Negro Mate':
-        return 'bg-slate-900';
-      case 'Lavanda Pastel':
-        return 'bg-purple-400';
-      case 'Rojo Fuego':
-        return 'bg-red-600';
-      default:
-        return 'bg-primary';
-    }
-  };
+ 
 
   const petName = pet.nombre || pet.name || 'Mascota';
   const guardianName = pet.guardian?.name || pet.usuario?.nombre || 'Tutor';
@@ -190,17 +173,6 @@ export function PetCard({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-surface/70 px-2.5 py-1 rounded-xl border border-primary/10">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full ${getFilamentColorDot(
-                      pet.nfcTag.filamentColor
-                    )}`}
-                    title={`Filamento: ${pet.nfcTag.filamentColor}`}
-                  />
-                  <span className="text-[11px] font-bold text-text truncate max-w-[80px]">
-                    {pet.nfcTag.filamentColor}
-                  </span>
-                </div>
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-textMuted pt-0.5 font-medium">
@@ -233,7 +205,7 @@ export function PetCard({
           )}
         </div>
 
-        {/* Datos del Tutor y Notas Médicas */}
+      
         <div className="p-5 space-y-3 text-xs">
           <div>
             <span className="text-[10px] uppercase font-extrabold text-textMuted tracking-wider block mb-1">
@@ -246,13 +218,6 @@ export function PetCard({
               </div>
               {guardianPhone && (
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <a
-                    href={`tel:${guardianPhone}`}
-                    className="p-2 rounded-xl bg-surface text-text hover:text-primary border border-primary/10 transition shadow-sm"
-                    title="Llamar al tutor"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                  </a>
                   <a
                     href={whatsappUrl}
                     target="_blank"

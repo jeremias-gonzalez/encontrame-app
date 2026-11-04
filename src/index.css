@@ -18,7 +18,7 @@
   --color-cafe: var(--color-cafe);
   --color-turquesa: var(--color-turquesa);
   --color-cobre-claro: var(--color-cobre-claro);
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* =========================================================
