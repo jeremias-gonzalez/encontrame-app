@@ -40,15 +40,15 @@ export function UsersPage() {
     <section className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-black text-[#92553A] dark:text-[#E3B48F]">Usuarios</h1>
+          <h1 className="text-3xl font-black text-title">Usuarios</h1>
           <p className="text-sm text-textMuted">Gestión de tutores, perfiles y mascotas asociadas.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => fetchUsers().catch(() => {})} className="inline-flex items-center gap-2 rounded-xl border border-primary/20 px-3 py-2 text-sm"><RefreshCw className="h-4 w-4" />Actualizar</button>
-          <button onClick={() => { setEditingUser(null); setModalOpen(true); }} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-bold text-white"><Plus className="h-4 w-4" />Nuevo usuario</button>
+          <button onClick={() => { setEditingUser(null); setModalOpen(true); }} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-bold text-[#FBF7F1] transition hover:bg-primaryHover dark:text-[#1E130C]"><Plus className="h-4 w-4" />Nuevo usuario</button>
         </div>
       </header>
-      {(actionError || error) && <p role="alert" className="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-700">{actionError || error}</p>}
+      {(actionError || error) && <p role="alert" className="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-700 dark:text-rose-300">{actionError || error}</p>}
       {loading ? <p role="status" className="rounded-2xl bg-surface p-6 text-sm text-textMuted">Cargando usuarios…</p> : (
         <div className="overflow-x-auto rounded-2xl bg-surface shadow-sm">
           <table className="w-full min-w-[700px] text-left text-sm">
@@ -72,12 +72,12 @@ export function UsersPage() {
         </div>
       )}
       {selectedUser && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 p-4" onClick={() => setSelectedUser(null)}>
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-40 flex items-center justify-center bg-cafe/60 p-4 backdrop-blur-sm" onClick={() => setSelectedUser(null)}>
           <div className="w-full max-w-lg space-y-3 rounded-2xl bg-surface p-6 text-sm" onClick={(event) => event.stopPropagation()}>
             <h2 className="text-lg font-bold">{selectedUser.nombre}</h2><p>{selectedUser.email}</p><p>{selectedUser.telefono || 'Sin teléfono'}</p><p>{selectedUser.direccion || 'Sin dirección'} · {selectedUser.ciudad || ''}</p>
             <h3 className="font-bold">Mascotas ({selectedUser.mascotas?.length || 0})</h3>
             {selectedUser.mascotas?.map((pet) => <p key={pet.id}>{pet.nombre} · {pet.especie} · {pet.raza}</p>)}
-            <button onClick={() => setSelectedUser(null)} className="rounded-xl bg-primary px-4 py-2 text-white">Cerrar</button>
+            <button onClick={() => setSelectedUser(null)} className="rounded-xl bg-primary px-4 py-2 font-semibold text-[#FBF7F1] hover:bg-primaryHover dark:text-[#1E130C]">Cerrar</button>
           </div>
         </div>
       )}

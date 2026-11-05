@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
 import { UserProvider } from './context/UserContext';
@@ -69,6 +69,11 @@ function AppContent() {
 }
 
 export function App() {
+  useLayoutEffect(() => {
+    const theme = localStorage.getItem('nfc-pets-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  }, []);
+
   return (
     <BrowserRouter>
       <ToastProvider>

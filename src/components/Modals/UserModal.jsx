@@ -90,9 +90,9 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-surface w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cafe/60 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-surface w-full max-w-lg rounded-3xl border border-primary/15 shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-6 pb-4 border-b border-primary/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
               <UserPlus className="w-5 h-5" />
@@ -108,7 +108,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-textMuted hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-textMuted hover:bg-primary/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -133,7 +133,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 placeholder="Carlos Gómez"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
 
@@ -147,7 +147,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="carlos@example.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -164,7 +164,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={contraseña}
                 onChange={(e) => setContraseña(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
           )}
@@ -179,7 +179,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
                 placeholder="+5493512345678"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
 
@@ -192,7 +192,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={telefonoSecundario}
                 onChange={(e) => setTelefonoSecundario(e.target.value)}
                 placeholder="+5493519876543"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -207,7 +207,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={direccion}
                 onChange={(e) => setDireccion(e.target.value)}
                 placeholder="Bv. San Juan 450"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
 
@@ -220,7 +220,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
                 placeholder="Córdoba"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -232,7 +232,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
             <select
               value={rol}
               onChange={(e) => setRol(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-primary/20 bg-surface text-text text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none cursor-pointer"
             >
               <option value="dueno">Dueño / Tutor</option>
               <option value="veterinaria">Veterinaria</option>
@@ -240,7 +240,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
             </select>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-primary/10 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -251,7 +251,7 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-[#8D4925] hover:bg-[#5E2F17] dark:bg-[#E3B48F] dark:hover:bg-[#F3E6CF] text-[#FBF7F1] dark:text-[#1E130C] transition shadow-md shadow-[#8D4925]/20 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl bg-primary hover:bg-primaryHover text-[#FBF7F1] dark:text-[#1E130C] transition shadow-md shadow-primary/20 disabled:opacity-50 cursor-pointer"
             >
               <Check className="w-4 h-4" />
               {isSubmitting ? 'Guardando...' : (editingUser ? 'Guardar Cambios' : 'Crear Usuario')}
@@ -264,4 +264,3 @@ export function UserModal({ isOpen, onClose, editingUser = null, onSuccess }) {
 }
 
 export default UserModal;
-

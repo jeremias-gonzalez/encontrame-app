@@ -36,25 +36,25 @@ export function AuthPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4 text-text">
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5 rounded-3xl bg-surface p-7 shadow-xl">
+      <form onSubmit={handleSubmit} className="glass-panel w-full max-w-md space-y-5 rounded-3xl p-7 text-text shadow-xl">
         <div>
-          <Link to="/" className="text-sm font-bold text-primary">← Encontrame</Link>
-          <h1 className="mt-4 text-2xl font-black">{isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}</h1>
+          <Link to="/" className="text-sm font-bold text-primary hover:text-primaryHover">← Encontrame</Link>
+          <h1 className="mt-4 text-2xl font-black text-title">{isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}</h1>
           <p className="mt-1 text-sm text-textMuted">Autenticación segura mediante FastAPI.</p>
         </div>
-        {error && <p role="alert" className="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-700">{error}</p>}
+        {error && <p role="alert" className="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-700 dark:text-rose-300">{error}</p>}
         {isRegistering && (
           <label className="block text-sm font-semibold">Nombre
-            <input required name="nombre" value={form.nombre} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
+            <input required name="nombre" value={form.nombre} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2 text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
           </label>
         )}
         <label className="block text-sm font-semibold">Email
-          <input required type="email" name="email" value={form.email} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
+          <input required type="email" name="email" value={form.email} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2 text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </label>
         <label className="block text-sm font-semibold">Contraseña
-          <input required minLength={isRegistering ? 6 : undefined} type="password" name="contraseña" value={form.contraseña} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
+          <input required minLength={isRegistering ? 6 : undefined} type="password" name="contraseña" value={form.contraseña} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2 text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </label>
-        <button disabled={loading} className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-white disabled:opacity-50">
+        <button disabled={loading} className="w-full rounded-xl bg-primary px-4 py-3 font-bold text-[#FBF7F1] transition hover:bg-primaryHover dark:text-[#1E130C] disabled:opacity-50">
           {loading ? 'Conectando…' : isRegistering ? 'Registrarme' : 'Ingresar'}
         </button>
         <button type="button" onClick={() => { setIsRegistering((value) => !value); setError(null); }} className="w-full text-sm text-primary hover:underline">
