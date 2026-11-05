@@ -1,7 +1,24 @@
 import React, { useState } from 'react';
-import { AlertCircle, Check, X } from 'lucide-react';
+import { AlertCircle, Check, RefreshCw, X } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useTags } from '../../context/TagContext';
 import { useVeterinaria } from '../../context/VeterinariaContext';
+
+function generateIdentifier(prefix) {
+  const bytes = new Uint8Array(6);
+  window.crypto.getRandomValues(bytes);
+  const value = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
+  return `${prefix}-${value}`;
+}
+
+function generatedIdentifiers() {
+  const value = () => generateIdentifier('ENC');
+  return {
+    codigoQR: `QR-${value()}`,
+    uidNFC: `NFC-${value()}`,
+    token_publico: value().toLowerCase(),
+  };
+}
 
 function initialForm(tag) {
   return tag ? {
@@ -13,9 +30,7 @@ function initialForm(tag) {
     estado: tag.estado || 'disponible',
     veterinaria_id: tag.veterinaria_id ? String(tag.veterinaria_id) : '',
   } : {
-    codigoQR: '',
-    uidNFC: '',
-    token_publico: '',
+    ...generatedIdentifiers(),
     precio: 5000,
     activo: true,
     estado: 'disponible',
@@ -29,8 +44,15 @@ export function TagModal({ isOpen, onClose, editingTag = null, onSuccess }) {
   const [form, setForm] = useState(() => initialForm(editingTag));
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const publicUrl = form.token_publico
+    ? new URL(`/scan/${encodeURIComponent(form.token_publico)}`, window.location.origin).toString()
+    : '';
 
   if (!isOpen) return null;
+
+  const regenerateIdentifiers = () => {
+    setForm((current) => ({ ...current, ...generatedIdentifiers() }));
+  };
 
   const setField = (event) => {
     const { name, value, type, checked } = event.target;
@@ -45,7 +67,7 @@ export function TagModal({ isOpen, onClose, editingTag = null, onSuccess }) {
       ...form,
       codigoQR: form.codigoQR.trim(),
       uidNFC: form.uidNFC.trim(),
-      token_publico: form.token_publico.trim() || undefined,
+      token_publico: form.token_publico.trim(),
       precio: Number(form.precio),
       veterinaria_id: form.veterinaria_id ? Number(form.veterinaria_id) : null,
     };
@@ -64,11 +86,13 @@ export function TagModal({ isOpen, onClose, editingTag = null, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4 rounded-3xl bg-surface p-6 text-text shadow-2xl">
+      <form onSubmit={handleSubmit} className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-3xl bg-surface p-6 text-text shadow-2xl">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold">{editingTag ? 'Editar tag NFC' : 'Registrar tag NFC'}</h2>
-            <p className="text-xs text-textMuted">Los campos con * son obligatorios.</p>
+            <p className="text-xs text-textMuted">
+              {editingTag ? 'Identificadores del tag.' : 'El QR, el UID NFC y el token se generan automáticamente.'}
+            </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Cerrar" className="rounded-xl p-2 text-textMuted hover:bg-slate-100">
             <X className="h-5 w-5" />
@@ -83,16 +107,29 @@ export function TagModal({ isOpen, onClose, editingTag = null, onSuccess }) {
 
         <label className="block text-xs font-semibold">
           Código QR *
-          <input required name="codigoQR" value={form.codigoQR} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
+          <input required readOnly name="codigoQR" value={form.codigoQR} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
         </label>
         <label className="block text-xs font-semibold">
           UID NFC *
-          <input required name="uidNFC" value={form.uidNFC} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
+          <input required readOnly name="uidNFC" value={form.uidNFC} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2 font-mono" />
         </label>
-        <label className="block text-xs font-semibold">
-          Token público (opcional; se genera automáticamente si queda vacío)
-          <input name="token_publico" value={form.token_publico} onChange={setField} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2" />
-        </label>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label className="min-w-0 flex-1 text-xs font-semibold">
+            Token público
+            <input readOnly name="token_publico" value={form.token_publico} className="mt-1 w-full rounded-xl border border-primary/20 bg-surface px-3 py-2 font-mono" />
+          </label>
+          {!editingTag && (
+            <button type="button" onClick={regenerateIdentifiers} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-primary/20 px-3 py-2 text-xs font-semibold text-primary">
+              <RefreshCw className="h-4 w-4" />Regenerar
+            </button>
+          )}
+        </div>
+        {publicUrl && (
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-primary/10 bg-white p-4 text-center">
+            <QRCodeSVG value={publicUrl} size={160} level="M" title={`QR público de ${form.codigoQR}`} />
+            <p className="break-all text-xs text-textMuted">{publicUrl}</p>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-xs font-semibold">
             Precio
