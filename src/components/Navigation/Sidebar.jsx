@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 export function Sidebar({
   metrics,
   onOpenCreatePet,
-  onOpenPairTag,
+
 }) {
   const { currentVeterinaria } = useVeterinaria();
   const { currentUser, isAuthenticated, logout } = useUser();
@@ -82,7 +82,6 @@ export function Sidebar({
             </motion.div>
           </div>
           <p className="text-[11px] font-medium text-textMuted mt-1 flex items-center gap-1.5 pl-0.5">
-            {currentVeterinaria?.nombre || 'Veterinaria San Roque'} · Punto de encuentro
           </p>
         </div>
 
@@ -99,15 +98,7 @@ export function Sidebar({
 
          
 
-          <motion.button
-            whileHover={{ y: -1, scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onOpenPairTag}
-            className="w-full py-2 px-3.5 rounded-2xl bg-[#F1E8DC]/90 hover:bg-[#F1E8DC] dark:bg-[#2A1B11]/90 dark:hover:bg-[#2A1B11] text-text border border-primary/20 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
-          >
-            <Radio className="w-3.5 h-3.5 text-[#2A8C82]" />
-            <span>Lector NFC</span>
-          </motion.button>
+          
         </div>
 
         {/* Router Navigation Links (Glassmorphism Navlinks) */}
@@ -212,22 +203,7 @@ export function Sidebar({
         </div>
 
         {/* Card Perfil de la Veterinaria */}
-        <div className="p-2.5 rounded-2xl glass-card flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Building2 className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold text-text truncate">
-                {currentVeterinaria?.nombre || 'San Roque Central'}
-              </p>
-              <p className="text-[10px] text-textMuted truncate">
-                {currentVeterinaria?.telefono || 'Punto Oficial'}
-              </p>
-            </div>
-          </div>
-
-        </div>
+      
       </div>
     </aside>
   );
