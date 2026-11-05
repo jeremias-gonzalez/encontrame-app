@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Radio, Plus, ExternalLink, Unlink, Sparkles, AlertCircle } from 'lucide-react';
+import { Radio, Plus, ExternalLink, Unlink, AlertCircle } from 'lucide-react';
 import { usePets } from '../hooks/usePets';
 import { useToast } from '../context/ToastContext';
 import { NfcPairingModal } from '../components/Dashboard/NfcPairingModal';
@@ -14,8 +14,12 @@ export function TagsPage({ onPreviewNfc }) {
   const unpairedPets = pets.filter((p) => !p.nfcTag && !p.tag_id);
 
   const handleUnpair = async (petId, name) => {
-    await unpairTag(petId);
-    showToast('Dije Desvinculado', `Se liberó el chip NFC asignado a ${name}.`, 'info');
+    try {
+      await unpairTag(petId);
+      showToast('Llavero Desvinculado', `Se liberó el chip NFC asignado a ${name}.`, 'info');
+    } catch (requestError) {
+      showToast('No se pudo desvincular', requestError.message, 'error');
+    }
   };
 
   const handleConfirmPair = async (petId, tagCode, filamentColor) => {
@@ -104,9 +108,6 @@ export function TagsPage({ onPreviewNfc }) {
                         <span className="font-mono text-xs font-extrabold text-primary">
                           {pet.nfcTag?.tagCode || `TAG #${pet.tag_id}`}
                         </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface/80 border border-primary/10">
-                          {pet.nfcTag?.filamentColor || 'Azul Cobalto'}
-                        </span>
                       </div>
                       <p className="text-xs font-bold text-text truncate mt-0.5">
                         {petName} ({pet.breed || pet.raza})
@@ -186,4 +187,3 @@ export function TagsPage({ onPreviewNfc }) {
 }
 
 export default TagsPage;
-

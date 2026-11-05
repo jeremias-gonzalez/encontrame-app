@@ -2,19 +2,14 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from '../components/Navigation/Sidebar';
-import { TopBar } from '../components/Navigation/TopBar';
 import { PetModal } from '../components/Dashboard/PetModal';
 import { NfcPairingModal } from '../components/Dashboard/NfcPairingModal';
-import { UserModal } from '../components/Modals/UserModal';
-import { VeterinariaModal } from '../components/Modals/VeterinariaModal';
 import { useToast } from '../context/ToastContext';
 import { usePets } from '../hooks/usePets';
 
-export function DashboardLayout({ onSelectPetForRescue }) {
+export function DashboardLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [isVetModalOpen, setIsVetModalOpen] = useState(false);
   const [pairingPet, setPairingPet] = useState(null);
 
   const {
@@ -22,7 +17,6 @@ export function DashboardLayout({ onSelectPetForRescue }) {
     metrics,
     createPet,
     pairTag,
-    resetToSeeds,
   } = usePets();
 
   const { showToast } = useToast();
@@ -38,13 +32,6 @@ export function DashboardLayout({ onSelectPetForRescue }) {
     setPairingPet(null);
   };
 
-  const handleResetDemoData = async () => {
-    if (window.confirm('¿Restablecer los datos demo en LocalStorage?')) {
-      await resetToSeeds();
-      showToast('Datos Semilla Restaurados', 'El almacenamiento ha sido reiniciado a su estado inicial.', 'info');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background text-text flex relative">
       {/* 1. Sidebar Desktop (Fijo a la izquierda) */}
@@ -56,9 +43,6 @@ export function DashboardLayout({ onSelectPetForRescue }) {
             const firstUnpaired = pets.find((p) => !p.nfcTag) || pets[0];
             if (firstUnpaired) setPairingPet(firstUnpaired);
           }}
-          onOpenCreateUser={() => setIsUserModalOpen(true)}
-          onOpenCreateVeterinaria={() => setIsVetModalOpen(true)}
-          onResetDemo={handleResetDemoData}
         />
       </div>
 
@@ -91,18 +75,6 @@ export function DashboardLayout({ onSelectPetForRescue }) {
                   const firstUnpaired = pets.find((p) => !p.nfcTag) || pets[0];
                   if (firstUnpaired) setPairingPet(firstUnpaired);
                 }}
-                onOpenCreateUser={() => {
-                  setMobileMenuOpen(false);
-                  setIsUserModalOpen(true);
-                }}
-                onOpenCreateVeterinaria={() => {
-                  setMobileMenuOpen(false);
-                  setIsVetModalOpen(true);
-                }}
-                onResetDemo={() => {
-                  setMobileMenuOpen(false);
-                  handleResetDemoData();
-                }}
               />
             </motion.div>
           </>
@@ -111,8 +83,6 @@ export function DashboardLayout({ onSelectPetForRescue }) {
 
       {/* 3. Área Principal a la Derecha del Sidebar */}
       <div className="flex-1 flex flex-col min-w-0">
-  
-
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
@@ -132,24 +102,8 @@ export function DashboardLayout({ onSelectPetForRescue }) {
         onConfirmPair={handleConfirmPair}
       />
 
-      <UserModal
-        isOpen={isUserModalOpen}
-        onClose={() => setIsUserModalOpen(false)}
-        onSuccess={() => {
-          showToast('Usuario Creado', 'Nuevo usuario registrado exitosamente en FastAPI.', 'success');
-        }}
-      />
-
-      <VeterinariaModal
-        isOpen={isVetModalOpen}
-        onClose={() => setIsVetModalOpen(false)}
-        onSuccess={() => {
-          showToast('Veterinaria Guardada', 'Clínica veterinaria registrada en FastAPI.', 'success');
-        }}
-      />
     </div>
   );
 }
 
 export default DashboardLayout;
-

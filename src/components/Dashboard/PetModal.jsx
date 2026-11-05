@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, PawPrint, User, Radio, Sparkles, Check, AlertCircle } from 'lucide-react';
+import { X, PawPrint, User, Check, AlertCircle } from 'lucide-react';
 import { useUser } from '../../context/UserContext';
-import { api } from '../../api/config';
 
 const PRESET_PHOTOS = [
   { label: 'Golden', url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80' },
@@ -50,11 +49,6 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
   const [guardianEmail, setGuardianEmail] = useState('');
   const [guardianAddress, setGuardianAddress] = useState('');
 
-  // Estados de NFC
-  const [hasNfc, setHasNfc] = useState(false);
-  const [tagCode, setTagCode] = useState('');
-  const [availableTags, setAvailableTags] = useState([]);
-
   // useEffect para sincronizar cuando se abre el modal o cambia editingPet
   useEffect(() => {
     if (!isOpen) return;
@@ -85,8 +79,6 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
       setGuardianEmail(editingPet.guardian?.email || editingPet.usuario?.email || '');
       setGuardianAddress(editingPet.guardian?.address || editingPet.usuario?.direccion || '');
 
-      setHasNfc(!!editingPet.nfcTag || !!editingPet.tag_id);
-      setTagCode(editingPet.nfcTag?.tagCode || '');
     } else {
       // Reset formulario limpio
       setNombre('');
@@ -110,45 +102,18 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
       setGuardianPhone('');
       setGuardianEmail('');
       setGuardianAddress('');
-      setHasNfc(false);
-      setTagCode('');
     }
 
     setFormError(null);
     setActiveTab('pet');
   }, [isOpen, editingPet, users]);
 
-  // useEffect para cargar tags disponibles desde FastAPI
   useEffect(() => {
     if (!isOpen) return;
-    let isCancelled = false;
-
-    async function loadTags() {
-      try {
-        const res = await api.get('/tags/?page=1&size=50');
-        const list = Array.isArray(res) ? res : (res?.items || []);
-        if (!isCancelled) {
-          setAvailableTags(list);
-        }
-      } catch (e) {
-        console.warn('FastAPI tags no disponibles, operando en modo local:', e.message);
-      }
-    }
-
-    loadTags();
-    fetchUsers();
-
-    return () => {
-      isCancelled = true;
-    };
+    fetchUsers().catch((requestError) => setFormError(requestError.message));
   }, [isOpen, fetchUsers]);
 
   if (!isOpen) return null;
-
-  const generateRandomTagCode = () => {
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    setTagCode(`ENC-${randomNum}-NFC`);
-  };
 
   const handleSelectUser = (id) => {
     setUsuarioId(id);
@@ -209,12 +174,6 @@ export function PetModal({ isOpen, onClose, onSave, editingPet = null }) {
           city: 'Córdoba Capital',
           emergencyNotes: mensajePersonalizado.trim() || undefined,
         },
-        nfcTag: hasNfc
-          ? {
-              tagCode: tagCode.trim().toUpperCase() || `ENC-${Math.floor(1000 + Math.random() * 9000)}-NFC`,
-              status: 'active',      
-            }
-          : undefined,
       };
 
       await onSave(payload);

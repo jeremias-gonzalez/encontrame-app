@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Phone,
   MessageCircle,
@@ -13,22 +13,15 @@ import {
 } from 'lucide-react';
 import { BrandLogo } from '../Common/BrandLogo';
 import { api } from '../../api/config';
-import { petRepository } from '../../repositories/LocalStoragePetRepository';
 
-export function PublicRescueView({ pet, onBackToDashboard }) {
+export function PublicRescueView({ pet, onBackToDashboard, scanIdentifier }) {
   const [hasReportedLocation, setHasReportedLocation] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [reporting, setReporting] = useState(false);
+  const [reportError, setReportError] = useState(null);
+  const [rescuePhone, setRescuePhone] = useState('');
 
-  const tagIdentifier = pet?.nfcTag?.tagCode || pet?.tag?.codigoQR || pet?.tag?.token_publico;
-
-  // Registrar escaneo en FastAPI (/scan/{identificador}) o localmente
-  useEffect(() => {
-    if (tagIdentifier) {
-      api.get(`/scan/${encodeURIComponent(tagIdentifier)}`).catch(() => {
-        petRepository.recordScan(tagIdentifier).catch(console.error);
-      });
-    }
-  }, [tagIdentifier]);
+  const tagIdentifier = scanIdentifier || pet?.tag?.token_publico || pet?.nfcTag?.tagCode || pet?.tag?.codigoQR;
 
   if (!pet) return null;
 
@@ -41,16 +34,42 @@ export function PublicRescueView({ pet, onBackToDashboard }) {
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(emergencyWhatsappText)}`;
 
   const handleShareLocation = async () => {
-    setHasReportedLocation(true);
-    // Enviar reporte a FastAPI si hay identificador
-    if (tagIdentifier) {
-      api.post(`/scan/${encodeURIComponent(tagIdentifier)}/reportar`, {
-        mensaje: `¡Ubicación reportada! Acabo de escanear el dije de ${petName}.`,
-        telefono_contacto: cleanPhone || null,
-      }).catch(console.warn);
+    setReporting(true);
+    setReportError(null);
+    try {
+      if (!tagIdentifier) throw new Error('Esta ficha no tiene un identificador de tag para enviar el aviso.');
+      let coordinates = {};
+      if (navigator.geolocation) {
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+          });
+          coordinates = {
+            latitud: position.coords.latitude,
+            longitud: position.coords.longitude,
+          };
+        } catch {
+          coordinates = {};
+        }
+      }
+
+      const message = `Acabo de escanear el tag de ${petName}.`;
+      await api.post(`/scan/${encodeURIComponent(tagIdentifier)}/reportar`, {
+        ...coordinates,
+        mensaje: message,
+        telefono_contacto: rescuePhone.trim() || null,
+      });
+      setHasReportedLocation(true);
+      if (cleanPhone) {
+        const hasCoordinates = coordinates.latitud !== undefined;
+        const locationMsg = `${message}${hasCoordinates ? ` Mi ubicación: https://maps.google.com/?q=${coordinates.latitud},${coordinates.longitud}` : ''}`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(locationMsg)}`, '_blank', 'noopener,noreferrer');
+      }
+    } catch (requestError) {
+      setReportError(requestError.message);
+    } finally {
+      setReporting(false);
     }
-    const locationMsg = `¡Ubicación reportada! Acabo de escanear el dije de ${petName}. Mi ubicación aproximada es en Córdoba Capital.`;
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(locationMsg)}`, '_blank');
   };
 
   const handleCopyLink = () => {
@@ -174,12 +193,24 @@ export function PublicRescueView({ pet, onBackToDashboard }) {
           )}
 
           {/* Compartir ubicación */}
+          <label className="block text-left text-xs text-slate-400">
+            Tu teléfono (opcional)
+            <input
+              type="tel"
+              value={rescuePhone}
+              onChange={(event) => setRescuePhone(event.target.value)}
+              placeholder="+54 9…"
+              className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-white"
+            />
+          </label>
+          {reportError && <p role="alert" className="rounded-xl bg-rose-900/50 p-3 text-xs text-rose-200">{reportError}</p>}
           <button
             onClick={handleShareLocation}
+            disabled={reporting || hasReportedLocation}
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-amber-400 text-xs font-bold border border-amber-500/30 transition cursor-pointer"
           >
             <MapPin className="w-4 h-4" />
-            {hasReportedLocation ? '¡Ubicación reportada al WhatsApp!' : 'Avisar mi ubicación GPS actual'}
+            {reporting ? 'Enviando aviso…' : hasReportedLocation ? 'Aviso enviado al tutor' : 'Avisar mi ubicación GPS actual'}
           </button>
         </div>
 
@@ -245,4 +276,3 @@ export function PublicRescueView({ pet, onBackToDashboard }) {
 }
 
 export default PublicRescueView;
-

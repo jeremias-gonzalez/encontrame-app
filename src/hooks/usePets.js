@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createElement, createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../api/config';
-import { petRepository } from '../repositories/LocalStoragePetRepository';
+import { fetchAllPages } from '../api/pagination';
+import { useUser } from '../context/UserContext';
+import { useTags } from '../context/TagContext';
 
 /**
  * Normaliza los datos que vienen de FastAPI (con campos en español)
@@ -60,7 +62,11 @@ export function normalizePet(raw) {
   };
 }
 
-export function usePets() {
+const PetContext = createContext(null);
+
+function usePetStore() {
+  const { users, usersLoaded, fetchUsers } = useUser();
+  const { fetchTags } = useTags();
   const [pets, setPets] = useState([]);
   const [metrics, setMetrics] = useState({
     totalPets: 0,
@@ -93,30 +99,31 @@ export function usePets() {
     };
   };
 
-  // Cargar datos desde FastAPI (/mascotas/) con fallback a localStorage
+  // Cargar datos vivos desde FastAPI y enriquecer las relaciones públicas.
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // 1. Intentar fetch a FastAPI
-      const res = await api.get('/mascotas/?page=1&size=100');
-      const items = Array.isArray(res) ? res : (res?.items || []);
-      const normalized = items.map(normalizePet);
+      const [items, tagList, userList] = await Promise.all([
+        fetchAllPages('/mascotas/', 100),
+        fetchTags(),
+        usersLoaded ? Promise.resolve(users) : fetchUsers(),
+      ]);
+      const userById = new Map(userList.map((user) => [String(user.id), user]));
+      const tagById = new Map(tagList.map((tag) => [String(tag.id), tag]));
+      const normalized = items.filter((item) => item.estado !== false).map((item) => normalizePet({
+        ...item,
+        usuario: userById.get(String(item.usuario_id)) || null,
+        tag: tagById.get(String(item.tag_id)) || null,
+      }));
       setPets(normalized);
       setMetrics(calculateMetrics(normalized));
     } catch (apiErr) {
-      console.warn('FastAPI no respondió o dio error. Usando almacenamiento local de respaldo:', apiErr.message);
-      try {
-        const localPets = await petRepository.getAll();
-        setPets(localPets);
-        setMetrics(calculateMetrics(localPets));
-      } catch {
-        setError('Error al cargar mascotas: ' + apiErr.message);
-      }
+      setError(`No se pudieron cargar las mascotas: ${apiErr.message}`);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchTags, fetchUsers, users, usersLoaded]);
 
   useEffect(() => {
     loadData();
@@ -174,10 +181,8 @@ export function usePets() {
       await loadData();
       return normalizePet(res);
     } catch (err) {
-      console.warn('Fallo llamada a FastAPI /mascotas/, guardando localmente:', err.message);
-      const createdLocal = await petRepository.create(formData);
-      await loadData();
-      return createdLocal;
+      setError(err.message);
+      throw err;
     }
   };
 
@@ -205,10 +210,8 @@ export function usePets() {
       await loadData();
       return normalizePet(res);
     } catch (err) {
-      console.warn('Fallo llamada a FastAPI PUT /mascotas/, actualizando localmente:', err.message);
-      const updatedLocal = await petRepository.update(id, formData);
-      await loadData();
-      return updatedLocal;
+      setError(err.message);
+      throw err;
     }
   };
 
@@ -219,10 +222,8 @@ export function usePets() {
       await loadData();
       return true;
     } catch (err) {
-      console.warn('Fallo llamada a FastAPI DELETE /mascotas/, eliminando localmente:', err.message);
-      const ok = await petRepository.delete(id);
-      await loadData();
-      return ok;
+      setError(err.message);
+      throw err;
     }
   };
 
@@ -252,36 +253,94 @@ export function usePets() {
       }
       await loadData();
     } catch (err) {
-      console.warn('Fallo llamada a FastAPI toggleLost, usando local:', err.message);
-      await petRepository.toggleLostStatus(id, isLost);
       await loadData();
+      setError(err.message);
+      throw err;
     }
   };
 
-  const pairTag = async (petId, tagCode, color) => {
+  const pairTag = async (petId, tagIdentifier) => {
     setError(null);
+    const pet = pets.find((item) => String(item.id) === String(petId));
+    if (!pet) throw new Error('No se encontró la mascota seleccionada.');
+
     try {
-      // Si se cuenta con endpoint de vinculación o alta de tag en FastAPI
-      await petRepository.pairNfcTag(petId, tagCode, color);
+      const availableTags = await fetchTags();
+      const tag = availableTags.find((item) => (
+        String(item.id) === String(tagIdentifier)
+        || item.codigoQR === tagIdentifier
+        || item.uidNFC === tagIdentifier
+        || item.token_publico === tagIdentifier
+      ));
+      if (!tag || !tag.activo || tag.estado !== 'disponible') {
+        throw new Error('El tag no existe o ya no está disponible.');
+      }
+
+      await api.put(`/tags/${tag.id}`, { ...tag, estado: 'reclamado' });
+      try {
+        await api.put(`/mascotas/${petId}`, {
+          nombre: pet.nombre,
+          especie: pet.especie,
+          raza: pet.raza,
+          color: pet.color,
+          foto_url: pet.foto_url || null,
+          estado_extravio: pet.estado_extravio,
+          notas_medicas: pet.notas_medicas || null,
+          mensaje_personalizado: pet.mensaje_personalizado || null,
+          mostrar_telefono: pet.mostrar_telefono,
+          mostrar_direccion: pet.mostrar_direccion,
+          recompensa: pet.recompensa || null,
+          estado: true,
+          tag_id: Number(tag.id),
+          usuario_id: pet.usuario_id ? Number(pet.usuario_id) : null,
+        });
+      } catch (petError) {
+        try {
+          await api.put(`/tags/${tag.id}`, { ...tag, estado: 'disponible' });
+        } catch (rollbackError) {
+          throw new Error(`${petError.message} Además, no se pudo liberar el tag: ${rollbackError.message}`);
+        }
+        throw petError;
+      }
       await loadData();
     } catch (err) {
+      await loadData();
       setError(err.message);
+      throw err;
     }
   };
 
   const unpairTag = async (petId) => {
     setError(null);
     try {
-      await petRepository.unpairNfcTag(petId);
+      const pet = pets.find((item) => String(item.id) === String(petId));
+      if (!pet?.tag_id) throw new Error('La mascota no tiene un tag asociado.');
+      await api.put(`/mascotas/${petId}`, {
+        nombre: pet.nombre,
+        especie: pet.especie,
+        raza: pet.raza,
+        color: pet.color,
+        foto_url: pet.foto_url || null,
+        estado_extravio: pet.estado_extravio,
+        notas_medicas: pet.notas_medicas || null,
+        mensaje_personalizado: pet.mensaje_personalizado || null,
+        mostrar_telefono: pet.mostrar_telefono,
+        mostrar_direccion: pet.mostrar_direccion,
+        recompensa: pet.recompensa || null,
+        estado: true,
+        tag_id: null,
+        usuario_id: pet.usuario_id ? Number(pet.usuario_id) : null,
+      });
+      const currentTags = await fetchTags();
+      const tag = currentTags.find((item) => String(item.id) === String(pet.tag_id));
+      if (tag) {
+        await api.put(`/tags/${tag.id}`, { ...tag, estado: 'disponible' });
+      }
       await loadData();
     } catch (err) {
       setError(err.message);
+      throw err;
     }
-  };
-
-  const resetToSeeds = async () => {
-    petRepository.resetDemoData();
-    await loadData();
   };
 
   return {
@@ -303,6 +362,16 @@ export function usePets() {
     toggleLost,
     pairTag,
     unpairTag,
-    resetToSeeds,
   };
+}
+
+export function PetProvider({ children }) {
+  const value = usePetStore();
+  return createElement(PetContext.Provider, { value }, children);
+}
+
+export function usePets() {
+  const context = useContext(PetContext);
+  if (!context) throw new Error('usePets debe utilizarse dentro de un PetProvider');
+  return context;
 }

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../api/config';
+import { fetchAllPages } from '../api/pagination';
 
 const VeterinariaContext = createContext(null);
 
@@ -10,30 +11,26 @@ export function VeterinariaProvider({ children }) {
   const [error, setError] = useState(null);
 
   // Cargar lista de veterinarias (/veterinarias/)
-  const fetchVeterinarias = useCallback(async (page = 1, size = 50) => {
+  const fetchVeterinarias = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.get(`/veterinarias/?page=${page}&size=${size}`);
-      const list = Array.isArray(res) ? res : (res?.items || []);
+      const list = await fetchAllPages('/veterinarias/');
       setVeterinarias(list);
       if (list.length > 0 && !currentVeterinaria) {
         setCurrentVeterinaria(list[0]);
-      }
-      return list;
+        }
+        return list;
     } catch (err) {
-      console.warn('No se pudo cargar la lista de veterinarias de FastAPI:', err.message);
-      setError(err.message);
-      return [];
+        setError(err.message);
+        throw err;
     } finally {
       setLoading(false);
     }
   }, [currentVeterinaria]);
 
   // Detalle de veterinaria con tags asignados (/veterinarias/{id})
-  const getVeterinaria = async (id) => {
-    return await api.get(`/veterinarias/${id}`);
-  };
+  const getVeterinaria = async (id) => api.get(`/veterinarias/${id}`);
 
   // Crear veterinaria (/veterinarias/)
   const createVeterinaria = async (data) => {
@@ -91,7 +88,7 @@ export function VeterinariaProvider({ children }) {
   };
 
   useEffect(() => {
-    fetchVeterinarias();
+    fetchVeterinarias().catch(() => {});
   }, [fetchVeterinarias]);
 
   const value = {
@@ -121,4 +118,3 @@ export function useVeterinaria() {
   }
   return context;
 }
-

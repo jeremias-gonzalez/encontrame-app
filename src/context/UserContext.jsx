@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { api, getStoredToken, setStoredToken, getStoredUser, setStoredUser } from '../api/config';
+import { fetchAllPages } from '../api/pagination';
 
 const UserContext = createContext(null);
 
@@ -7,6 +8,7 @@ export function UserProvider({ children }) {
   const [token, setToken] = useState(() => getStoredToken());
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
   const [users, setUsers] = useState([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -58,21 +60,23 @@ export function UserProvider({ children }) {
   };
 
   // Obtener lista de usuarios para asignar en mascotas / modales (/usuarios/)
-  const fetchUsers = useCallback(async (page = 1, size = 50) => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/usuarios/?page=${page}&size=${size}`);
-      // FastAPI puede devolver array directo o { items: [...] }
-      const list = Array.isArray(res) ? res : (res?.items || []);
+      setError(null);
+      const list = await fetchAllPages('/usuarios/');
       setUsers(list);
+      setUsersLoaded(true);
       return list;
     } catch (err) {
-      console.warn('No se pudo cargar la lista de usuarios de FastAPI:', err.message);
-      return [];
+      setError(err.message);
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const getUser = async (id) => api.get(`/usuarios/${id}`);
 
   // Crear usuario directo desde CRUD (/usuarios/)
   const createUser = async (userData) => {
@@ -95,22 +99,19 @@ export function UserProvider({ children }) {
     return res;
   };
 
-  // Cargar usuarios al montar
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
   const value = {
     token,
     currentUser,
     isAuthenticated: !!token,
     users,
+    usersLoaded,
     loading,
     error,
     login,
     register,
     logout,
     fetchUsers,
+    getUser,
     createUser,
     updateUser,
     deleteUser,
@@ -126,4 +127,3 @@ export function useUser() {
   }
   return context;
 }
-

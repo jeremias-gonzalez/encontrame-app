@@ -4,7 +4,6 @@ import {
   Search,
   Filter,
   Plus,
-  Sparkles,
 } from 'lucide-react';
 import { usePets } from '../hooks/usePets';
 import { useToast } from '../context/ToastContext';
@@ -40,7 +39,6 @@ export function DashboardPage({
     toggleLost,
     pairTag,
     unpairTag,
-    resetToSeeds,
   } = usePets();
 
   const { showToast } = useToast();
@@ -82,9 +80,7 @@ export function DashboardPage({
           <h2 className="text-3xl font-black text-[#92553A] dark:text-[#E3B48F] tracking-tight">
             Dashboard Veterinario
           </h2>
-          <p className="text-xs text-textMuted mt-0.5">
-            Gestión clínica de pacientes, tutores y vinculación de dijes 3D con tecnología NFC.
-          </p>
+
         </div>
 
         <motion.button
@@ -94,7 +90,7 @@ export function DashboardPage({
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#8D4925] hover:bg-[#5E2F17] dark:bg-[#E3B48F] dark:hover:bg-[#F3E6CF] text-[#FBF7F1] dark:text-[#1E130C] text-xs font-bold shadow-md shadow-[#8D4925]/20 transition-opacity cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Registrar Paciente</span>
+          <span>Registrar Mascota</span>
         </motion.button>
       </div>
 
@@ -148,9 +144,9 @@ export function DashboardPage({
               className="w-full md:w-auto text-xs font-bold bg-surface/80 text-text border border-primary/20 rounded-2xl px-3 py-2 outline-none focus:border-primary cursor-pointer transition"
             >
               <option value="all">Todos los estados</option>
-              <option value="paired">🟢 Con Dije NFC Activo</option>
-              <option value="unpaired">🟡 Sin Dije NFC (Pendiente)</option>
-              <option value="lost">🚨 ¡Alerta de Extravío (SOS)!</option>
+              <option value="paired">Con Dije NFC Activo</option>
+              <option value="unpaired"> Sin Dije NFC (Pendiente)</option>
+              <option value="lost"> ¡Alerta de Extravío (SOS)!</option>
             </select>
           </div>
         </div>
@@ -170,7 +166,6 @@ export function DashboardPage({
             setStatusFilter('all');
           }}
           onAddNewPet={() => setCreateOpen(true)}
-          onRestoreDemo={resetToSeeds}
         />
       ) : (
         <div className="space-y-4">
@@ -228,4 +223,3 @@ export function DashboardPage({
 }
 
 export default DashboardPage;
-

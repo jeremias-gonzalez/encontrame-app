@@ -3,7 +3,7 @@
  * Maneja cabeceras automáticas, JSON y token JWT Bearer.
  */
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 
 export function getStoredToken() {
   return localStorage.getItem('encontrame_token');
@@ -102,4 +102,3 @@ export const api = {
   put: (endpoint, body, headers) => apiRequest(endpoint, { method: 'PUT', body, headers }),
   delete: (endpoint, headers) => apiRequest(endpoint, { method: 'DELETE', headers }),
 };
-

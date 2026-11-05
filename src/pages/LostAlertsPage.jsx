@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Phone, MessageCircle, ExternalLink, CheckCircle, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, MessageCircle, ExternalLink, CheckCircle, ShieldAlert } from 'lucide-react';
 import { usePets } from '../hooks/usePets';
 import { useToast } from '../context/ToastContext';
 
@@ -11,8 +11,12 @@ export function LostAlertsPage({ onPreviewNfc }) {
 
   const handleMarkRecovered = async (pet) => {
     const petName = pet.nombre || pet.name;
-    await toggleLost(pet.id, false);
-    showToast('Mascota Recuperada', `${petName} fue marcado como seguro en casa.`, 'success');
+    try {
+      await toggleLost(pet.id, false);
+      showToast('Mascota Recuperada', `${petName} fue marcado como seguro en casa.`, 'success');
+    } catch (requestError) {
+      showToast('No se pudo actualizar', requestError.message, 'error');
+    }
   };
 
   return (
@@ -86,7 +90,7 @@ export function LostAlertsPage({ onPreviewNfc }) {
                       </p>
                       {pet.nfcTag && (
                         <p className="font-mono text-xs font-bold text-primary mt-1">
-                          Dije NFC: {pet.nfcTag.tagCode}
+                          Llavero: {pet.nfcTag.tagCode}
                         </p>
                       )}
                     </div>
@@ -107,13 +111,6 @@ export function LostAlertsPage({ onPreviewNfc }) {
                     </div>
                     {guardianPhone && (
                       <div className="flex items-center gap-1.5">
-                        <a
-                          href={`tel:${guardianPhone}`}
-                          className="p-2 rounded-xl bg-surface text-text hover:text-primary transition shadow-sm border border-primary/10"
-                          title="Llamar"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                        </a>
                         <a
                           href={whatsappUrl}
                           target="_blank"
@@ -155,4 +152,3 @@ export function LostAlertsPage({ onPreviewNfc }) {
 }
 
 export default LostAlertsPage;
-
