@@ -73,7 +73,12 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, header
   } else {
     data = await res.text();
   }
-
+  // Sesión vencida o token inválido: limpiar la sesión y volver al login
+  if (res.status === 401 && token && !endpoint.startsWith('/auth/')) {
+    setStoredToken(null);
+    setStoredUser(null);
+    window.location.assign('/iniciar-sesion');
+  }
   if (!res.ok) {
     let errorMsg = `Error HTTP ${res.status}`;
     if (data && typeof data === 'object') {
