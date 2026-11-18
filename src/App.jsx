@@ -17,7 +17,7 @@ import { RescueSimulatorPage } from './pages/RescueSimulatorPage';
 import { AuthPage } from './pages/AuthPage';
 import { PublicScanPage } from './pages/PublicScanPage';
 import Home from './pages/Home';
-
+import { ProtectedRoute } from './components/Navigation/ProtectedRoute';
 function DashboardRoutes() {
   const [selectedPetForRescue, setSelectedPetForRescue] = useState(null);
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ function AppContent() {
     <Routes>
       <Route path="/iniciar-sesion" element={<AuthPage />} />
       <Route path="/scan/:identificador" element={<PublicScanPage />} />
-      <Route path="/*" element={<WorkspaceProviders />} />
+      <Route path="/*" element={<ProtectedRoute><WorkspaceProviders /></ProtectedRoute>} />
     </Routes>
   );
 }
